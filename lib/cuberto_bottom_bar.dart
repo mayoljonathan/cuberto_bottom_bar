@@ -6,14 +6,15 @@ import 'package:cuberto_bottom_bar/internal/tab_item_new.dart';
 import 'package:flutter/material.dart';
 
 const double BAR_HEIGHT = 60;
-const int ANIM_DURATION = 300;
 
 class CubertoBottomBar extends StatefulWidget {
   final Function(int position, String title, Color tabColor)
       onTabChangedListener;
+  final int animationDuration;
   final Color inactiveIconColor;
   final Color tabColor;
   final Color textColor;
+  final Curve textCurve;
   final Color barBackgroundColor;
   final List<TabData> tabs;
   final int initialSelection;
@@ -26,9 +27,11 @@ class CubertoBottomBar extends StatefulWidget {
       {@required this.tabs,
       @required this.onTabChangedListener,
       this.key,
+      this.animationDuration = 400,
       this.initialSelection = 0,
       this.inactiveIconColor,
       this.textColor,
+      this.textCurve = Curves.fastOutSlowIn,
       this.tabColor,
       this.barBackgroundColor,
       this.drawer,
@@ -162,11 +165,13 @@ class CubertoBottomBarState extends State<CubertoBottomBar>
           .map((t) => tabStyle == CubertoTabStyle.STYLE_NORMAL
               ? TabItem(
                   uniqueKey: t.key,
+                  animationDuration: widget.animationDuration,
                   selected: t.key == tabs[currentSelected].key,
                   iconData: t.iconData,
                   title: t.title,
                   iconColor: inactiveIconColor,
                   textColor: textColor,
+                  textCurve: widget.textCurve,
                   tabColor: t.tabColor == null ? inactiveIconColor : t.tabColor,
                   callbackFunction: (uniqueKey) {
                     int selected =
@@ -177,11 +182,13 @@ class CubertoBottomBarState extends State<CubertoBottomBar>
                   })
               : TabItemNew(
                   uniqueKey: t.key,
+                  animationDuration: widget.animationDuration,
                   selected: t.key == tabs[currentSelected].key,
                   iconData: t.iconData,
                   title: t.title,
                   iconColor: inactiveIconColor,
                   textColor: textColor,
+                  textCurve: widget.textCurve,
                   tabColor: t.tabColor == null ? inactiveIconColor : t.tabColor,
                   callbackFunction: (uniqueKey) {
                     int selected =
@@ -221,12 +228,12 @@ class CubertoBottomBarState extends State<CubertoBottomBar>
   }
 
   _initAnimationAndStart(double from, double to) {
-    Future.delayed(Duration(milliseconds: ANIM_DURATION ~/ 5), () {
+    Future.delayed(Duration(milliseconds: widget.animationDuration ~/ 5), () {
       setState(() {
         activeIcon = nextIcon;
       });
     }).then((_) {
-      Future.delayed(Duration(milliseconds: (ANIM_DURATION ~/ 5 * 3)), () {
+      Future.delayed(Duration(milliseconds: (widget.animationDuration ~/ 5 * 3)), () {
         setState(() {});
       });
     });

@@ -11,20 +11,24 @@ const double ALPHA_ON = 1;
 class TabItem extends StatefulWidget {
   TabItem(
       {@required this.uniqueKey,
+      @required this.animationDuration,
       @required this.selected,
       @required this.iconData,
       @required this.title,
       @required this.callbackFunction,
       @required this.textColor,
+      @required this.textCurve,
       @required this.iconColor,
       @required this.tabColor});
 
   final UniqueKey uniqueKey;
+  final int animationDuration;
   final String title;
   final IconData iconData;
   final bool selected;
   final Function(UniqueKey uniqueKey) callbackFunction;
   final Color textColor;
+  final Curve textCurve;
   final Color iconColor;
   final Color tabColor;
 
@@ -37,18 +41,19 @@ class TabItem extends StatefulWidget {
   _TabItemState createState() => _TabItemState();
 }
 
-class _TabItemState extends State<TabItem> {
+class _TabItemState extends State<TabItem> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      padding: EdgeInsets.fromLTRB(15.0, 7.0, 15.0, 7.0),
-      duration: Duration(milliseconds: ANIM_DURATION),
+      duration: Duration(milliseconds: widget.animationDuration),
       decoration: BoxDecoration(
           color: widget.selected ? widget.iconColor : Colors.transparent,
           borderRadius: BorderRadius.all(Radius.circular(20.0))),
       child: InkWell(
+        onTap: () => widget.callbackFunction(widget.uniqueKey),
         child: AnimatedContainer(
-          duration: Duration(milliseconds: ANIM_DURATION),
+          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          duration: Duration(milliseconds: widget.animationDuration),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
@@ -57,27 +62,29 @@ class _TabItemState extends State<TabItem> {
                 color: widget.selected ? widget.textColor : widget.iconColor,
               ),
               AnimatedContainer(
-          duration: Duration(milliseconds: ANIM_DURATION),
-            padding: widget.selected
-                    ? EdgeInsets.only(left: 3.0, right: 3.0)
-                    : EdgeInsets.all(0.0),
-                child: Text(
-                  widget.selected ? widget.title : "",
-                  overflow: TextOverflow.clip,
-                  maxLines: 1,
-                  textAlign: TextAlign.start,
-                  style: TextStyle(
-                    color:  widget.textColor,
-                    fontWeight: FontWeight.bold,
-                  ),
+                duration: Duration(milliseconds: widget.animationDuration),
+                padding: widget.selected
+                  ? EdgeInsets.symmetric(horizontal: 6.0)
+                  : EdgeInsets.all(0.0),
+                child: AnimatedSize(
+                  vsync: this,
+                  duration: Duration(milliseconds: widget.animationDuration),
+                  curve: widget.textCurve,
+                  child: Text(
+                    widget.selected ? widget.title : "",
+                    overflow: TextOverflow.clip,
+                    maxLines: 1,
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      color:  widget.textColor,
+                      fontWeight: FontWeight.bold,
+                    )
+                  )
                 ),
               )
             ],
           ),
-        ),
-        onTap: () {
-          widget.callbackFunction(widget.uniqueKey);
-        },
+        )
       ),
     );
   }
